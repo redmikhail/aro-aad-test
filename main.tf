@@ -1,5 +1,5 @@
 module "aro-details" {
-  source = "../fetch_details"
+  source = "./fetch_details"
 
   aro_cluster_name        = var.aro_cluster_name
   aro_resource_group_name = var.aro_resource_group_name
@@ -7,7 +7,7 @@ module "aro-details" {
 }
 
 module "ad-config" {
-  source = "../k8s_ad"
+  source = "./k8s_ad"
   providers = {
 
   }
