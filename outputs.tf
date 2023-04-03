@@ -30,11 +30,11 @@ output "subscription_details-tenant_id" {
 # # }
 
 output "aro_cluster_details-name" {
-  value = module.aro-details.aro_cluster_details.name
+  value = module.aro-details.aro_cluster_details-name
 }
 
 output "aro_cluster_details-location" {
-  value = module.aro-details.aro_cluster_details.location
+  value = module.aro-details.aro_cluster_details-location
 }
 
 
@@ -77,6 +77,40 @@ output "aro_cluster_details-servicePrincipalClientId" {
   value = module.aro-details.aro_cluster_details-properties.servicePrincipalProfile.clientId
 }
 
+output "aro_cluster_details-servicePrincipalApplicationId" {
+  value = module.aro-details.aro_cluster_details-sp.application_id
+}
+
+output "aro_cluster_details-servicePrincipalApplicationTenantId" {
+  value = module.aro-details.aro_cluster_details-sp.application_tenant_id
+}
+
+output "aro_cluster_details-servicePrincipalDisplayName" {
+  value = module.aro-details.aro_cluster_details-sp.display_name
+}
+
+output "aro_cluster_details-servicePrincipalId" {
+  value = module.aro-details.aro_cluster_details-sp.id
+}
+
+output "aro_cluster_details-servicePrincipalObjectId" {
+  value = module.aro-details.aro_cluster_details-sp.object_id
+}
+
+output "aro_cluster_details-servicePrincipalType" {
+  value = module.aro-details.aro_cluster_details-sp.type
+}
+
+# Uncomment to see all the properties related to the cluster
+#output "aro_cluster_details-servicePrincipal_properties" {
+#  value = module.aro-details.aro_cluster_details-properties
+#}
+
+# Uncomment to see all the properties related to the service principal
+#output "aro_cluster_details-servicePrincipal" {
+#  value = module.aro-details.aro_cluster_details-sp
+#}
+
 output "aro_cluster_details-ingressProfiles" {
   value = module.aro-details.aro_cluster_details-properties.ingressProfiles
 }
@@ -108,9 +142,14 @@ output "aro_cluster_details-creds-resource_id" {
   value = module.aro-details.aro_cluster_details-creds_basic.resource_id
 }
 
-output "aro_cluster_details-creds_json" {
-  value = jsondecode(module.aro-details.aro_cluster_details-creds_basic.output)
+output "aro_cluster_details-creds-type" {
+  value = module.aro-details.aro_cluster_details-creds_basic.type
 }
+
+# Uncomment if one wants to see kube credentials
+#output "aro_cluster_details-creds_json" {
+#  value = jsondecode(module.aro-details.aro_cluster_details-creds_basic.output)
+#}
 
 
 
@@ -120,23 +159,43 @@ output "aro_cluster_details-creds_json" {
 #  ========================================
 
 #  For all the properties
-output "aro_cluster_details-creds_admin" {
-  value = module.aro-details.aro_cluster_details-creds_admin
+#output "aro_cluster_details-creds_admin" {
+#  value = module.aro-details.aro_cluster_details-creds_admin
+#}
+
+output "aro_cluster_details-creds_admin-id" {
+  value = module.aro-details.aro_cluster_details-creds_admin.id
 }
 
-# output "aro_cluster_details-creds_admin-id" {
-#   value = data.azapi_resource_action.admin-creds.id
-# }
+output "aro_cluster_details-creds_admin-method" {
+  value = module.aro-details.aro_cluster_details-creds_admin.method
+}
 
-# output "aro_cluster_details-creds_admin-method" {
-#   value = data.azapi_resource_action.admin-creds.method
-# }
+output "aro_cluster_details-creds_admin-resource_id" {
+  value = module.aro-details.aro_cluster_details-creds_admin.resource_id
+}
 
-# output "aro_cluster_details-creds_admin-resource_id" {
-#   value = data.azapi_resource_action.admin-creds.resource_id
-# }
+output "aro_cluster_details-creds_admin-type" {
+  value = module.aro-details.aro_cluster_details-creds_admin.type
+}
 
-# output "aro_cluster_details-creds_admin_json" {
-#   value = jsondecode(data.azapi_resource_action.admin-creds.output)
-# }
+# Uncomment if one wants to see the encoded kube config
+#output "aro_cluster_details-creds-kube_config" {
+#  value = module.aro-details.aro_cluster_details-kube_config.kubeconfig
+#}
+
+# Uncomment if one wants to see the decoded kube config
+#output "aro_cluster_details-creds-kube_config-json" {
+#  value = base64decode(module.aro-details.aro_cluster_details-kube_config.kubeconfig)
+#}
+
+
+#  ========================================
+#  K8s module output
+#  ========================================
+
+output "k8s_openid_secret" {
+  value = module.ad-config.k8s_openid_secret
+  sensitive = true
+}
 

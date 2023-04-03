@@ -13,7 +13,11 @@ terraform {
     azapi = {
       source  = "Azure/azapi"
       version = ">=1.4.0"
-    }    
+    }
+    local = {
+      source = "hashicorp/local"
+    }
+#    kubernetes = "1.13.3"
   }
 }
 

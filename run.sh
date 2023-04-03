@@ -85,6 +85,11 @@ function call_terraform_for_plan_or_apply() {
     read -p "Please enter location (default [$location]): " TMP_VAR
     location="${TMP_VAR:-$location}"
 
+    TMP_VAR=""
+    local clientSecret="NOT_SET"
+    read -p "Please enter clientSecret (default [$clientSecret]): " TMP_VAR
+    clientSecret="${TMP_VAR:-$clientSecret}"
+
     local extraOptions="-out ${MAIN_PLAN_FILE}"
 
     printf "\n   -> key ids/values used"
@@ -109,7 +114,8 @@ function call_terraform_for_plan_or_apply() {
       $extraOptions \
       -var "aro_resource_group_name=$aroResourceGroup" \
       -var "aro_cluster_name=$aroClusterName" \
-      -var "resource_group_location=$location"
+      -var "resource_group_location=$location" \
+      -var "aro_client_secret=\"$clientSecret\""
     set +x
   fi
 }

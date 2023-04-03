@@ -13,3 +13,7 @@ variable "resource_group_location" {
   default     = "canadacentral"
   description = "Location of the resource group."
 }
+
+variable "aro_client_secret" {
+  description = "Client secret for the App or SP"
+}
