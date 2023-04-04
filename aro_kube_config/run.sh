@@ -7,19 +7,17 @@ APPLY="apply"
 function display_menu_and_get_choice() {
   # Print the menu
   echo "================================================="
-  echo "WIP. Choose an option: "
+  echo "Choose an option: "
   echo "================================================="
   options=(
     "Terraform Init"
     "Terraform Plan"
     "Terraform Apply"
-    "Terraform Destroy"
-    "Delete Resource Group"
     "Quit"
   )
 
   # Select an option
-  COLUMNS=0
+#  COLUMNS=0
   select opt in "${options[@]}"; do
     case $opt in
     "Terraform Init")
@@ -34,19 +32,7 @@ function display_menu_and_get_choice() {
     "Terraform Apply")
       op="apply"
       call_terraform_for_plan_or_apply $op
-#      printf "\n -> WIP - NOT YET COMPLETE...\n"
       break
-      ;;
-    "Terraform Destroy")
-      op="destroy"
-#      call_terraform_for_plan_or_apply $op
-      printf "\n -> WIP - NOT YET COMPLETE...\n"
-      break
-      ;;
-    "Delete Resource Group")
-      printf "\n -> WIP - NOT YET COMPLETE...\n"
-#      delete_resource_group
-      exit
       ;;
     "Quit")
       exit
@@ -63,7 +49,7 @@ function call_terraform_for_plan_or_apply() {
   if [ "$op" == "$APPLY" -a -f "${MAIN_PLAN_FILE}" ]; then
     printf "\n\n -> Running terraform $op command using the ($MAIN_PLAN_FILE) file...\n"
     terraform apply $MAIN_PLAN_FILE
-    rm -f $MAIN_PLAN_FILE
+    rm -f $DESTROY_PLAN_FILE $MAIN_PLAN_FILE
   else
     local TMP_VAR=""
     local resourcePrefix="test001"
@@ -86,27 +72,39 @@ function call_terraform_for_plan_or_apply() {
     location="${TMP_VAR:-$location}"
 
     TMP_VAR=""
-    local clientSecret="NOT_SET"
-    read -p "Please enter clientSecret (default [$clientSecret]): " TMP_VAR
-    clientSecret="${TMP_VAR:-$clientSecret}"
+    local generateKubeConfig="true"
+    read -p "Generate kubeConfig (default [$generateKubeConfig]): " TMP_VAR
+    generateKubeConfig="${TMP_VAR:-$generateKubeConfig}"
 
-    local extraOptions="-out ${MAIN_PLAN_FILE}"
+    local kubeConfigPathVar=""
+    if [ "$generateKubeConfig" == "true" ]; then
+      TMP_VAR=""
+      local kubeConfigPath="/tmp/kubeconfig"
+      read -p "Please enter kubeConfigPath (default [$kubeConfigPath]): " TMP_VAR
+      kubeConfigPath="${TMP_VAR:-$kubeConfigPath}"
+
+      local kubeConfigPathVar="-var aro_cluster_kube_config_path=$kubeConfigPath"
+      if [ -z "$kubeConfigPath" ]; then
+        kubeConfigPathVar=""
+      fi
+    else
+      generateKubeConfig="false"  # Pass in false just in case user entered some other value (other than true/false)
+    fi
+
+    local extraOptions=""
+    if [ "$op" == "$PLAN" ]; then
+     extraOptions="-out ${MAIN_PLAN_FILE}"
+    else
+     extraOptions="-auto-approve"
+    fi
 
     printf "\n   -> key ids/values used"
-    for i in op aroResourceGroup location extraOptions
+    for i in op aroResourceGroup aroClusterName location extraOptions
     do
       printf "\n     - $i=${!i}"
     done
 
-    local op="$PLAN"
     printf "\n\n -> Running terraform $op command...\n"
-    extraOptions="-out ${MAIN_PLAN_FILE}"
-
-    # if [ "$op" == "$PLAN" ]; then
-      # extraOptions="-out ${MAIN_PLAN_FILE}"
-    # else
-    #   extraOptions="-auto-approve"
-    # fi
 
     set -x
     terraform $op \
@@ -115,26 +113,10 @@ function call_terraform_for_plan_or_apply() {
       -var "aro_resource_group_name=$aroResourceGroup" \
       -var "aro_cluster_name=$aroClusterName" \
       -var "resource_group_location=$location" \
-      -var "aro_client_secret=\"$clientSecret\""
+      -var "generate_kube_config=$generateKubeConfig" \
+      $kubeConfigPathVar
     set +x
   fi
 }
 
-
-function confirm_login() {
-  printf "\nAre you already logged in using az login? \n"
-  select answer in "Yes" "No"; do
-      case $answer in
-          Yes) 
-            echo ""
-            display_menu_and_get_choice
-            break;;
-          No)
-            echo "Please login first"
-            exit 1;;
-      esac
-  done
-}
-
-
-confirm_login
+display_menu_and_get_choice

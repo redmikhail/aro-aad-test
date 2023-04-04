@@ -1,6 +1,8 @@
 # User-specific files
 **/kubeconfig
 **/*.tfplan
+**/TMP
+**/tmp
 
 # Local .terraform directories
 **/.terraform/*
