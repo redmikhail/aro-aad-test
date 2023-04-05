@@ -33,10 +33,10 @@ on these directories:
   
   terraform plan -out main.tfplan \
     -var resource_group_name=<RESOURCE_GROUP_NAME> \
-    -var aro_cluster_name=<ARO_CLUSTER_NAME> \
+    -var cluster_name=<ARO_CLUSTER_NAME> \
     -var region=<RESOURCE_GROUP_LOCATION> \
     -var generate_kube_config=<TRUE_OR_FALSE> \
-    -var aro_cluster_kube_config_path=<KUBE_CONFIG_PATH>
+    -var kube_config_path=<KUBE_CONFIG_PATH>
   ```
   * `generate_kube_config` variable:
     * _When `generate_kube_config` variable is given a value of `false` the kubeConfig
@@ -44,9 +44,8 @@ on these directories:
       is set to the contents of kubeConfig. In this case, the caller can generate kubeConfig
       using this output (you will need to use `base64decode` on the output)_
     * _When `generate_kube_config` variable is given a value of `true`, value of 
-      `aro_cluster_kube_config_path` variable is used to generate the kubeConfig at
-      that location_
-  * `aro_cluster_kube_config_path` variable:
+      `kube_config_path` variable is used to generate the kubeConfig at that location_
+  * `kube_config_path` variable:
     * Value from this variable is used to generate the kubeConfig file. The value should
       include the directory + file name that should contain kubeconfig data. _Do NOT use
       `~` (tilde) to specify the path. Rather use the full path._ 

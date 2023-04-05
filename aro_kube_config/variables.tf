@@ -3,7 +3,7 @@ variable "resource_group_name" {
   description = "Name of the resource group name that contains ARO"
 }
 
-variable "aro_cluster_name" {
+variable "cluster_name" {
   description = "Name of the ARO cluster"
 }
 
@@ -11,7 +11,7 @@ variable "region" {
   description = "Location of the resource group."
 }
 
-variable "aro_cluster_kube_config_path" {
+variable "kube_config_path" {
   default = "/tmp/kubeconfig"
   description = "Location where kubeConfig will be created"
 }

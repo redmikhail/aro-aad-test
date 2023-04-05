@@ -83,7 +83,7 @@ function call_terraform_for_plan_or_apply() {
       read -p "Please enter kubeConfigPath (default [$kubeConfigPath]): " TMP_VAR
       kubeConfigPath="${TMP_VAR:-$kubeConfigPath}"
 
-      local kubeConfigPathVar="-var aro_cluster_kube_config_path=$kubeConfigPath"
+      local kubeConfigPathVar="-var kube_config_path=$kubeConfigPath"
       if [ -z "$kubeConfigPath" ]; then
         kubeConfigPathVar=""
       fi
@@ -111,7 +111,7 @@ function call_terraform_for_plan_or_apply() {
       -compact-warnings \
       $extraOptions \
       -var "resource_group_name=$aroResourceGroup" \
-      -var "aro_cluster_name=$aroClusterName" \
+      -var "cluster_name=$aroClusterName" \
       -var "region=$location" \
       -var "generate_kube_config=$generateKubeConfig" \
       $kubeConfigPathVar
