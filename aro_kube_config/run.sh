@@ -110,9 +110,9 @@ function call_terraform_for_plan_or_apply() {
     terraform $op \
       -compact-warnings \
       $extraOptions \
-      -var "aro_resource_group_name=$aroResourceGroup" \
+      -var "resource_group_name=$aroResourceGroup" \
       -var "aro_cluster_name=$aroClusterName" \
-      -var "resource_group_location=$location" \
+      -var "region=$location" \
       -var "generate_kube_config=$generateKubeConfig" \
       $kubeConfigPathVar
     set +x

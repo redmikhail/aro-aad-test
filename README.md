@@ -32,9 +32,9 @@ on these directories:
   cd aro_kube_config
   
   terraform plan -out main.tfplan \
-    -var aro_resource_group_name=<RESOURCE_GROUP_NAME> \
+    -var resource_group_name=<RESOURCE_GROUP_NAME> \
     -var aro_cluster_name=<ARO_CLUSTER_NAME> \
-    -var resource_group_location=<RESOURCE_GROUP_LOCATION> \
+    -var region=<RESOURCE_GROUP_LOCATION> \
     -var generate_kube_config=<TRUE_OR_FALSE> \
     -var aro_cluster_kube_config_path=<KUBE_CONFIG_PATH>
   ```
