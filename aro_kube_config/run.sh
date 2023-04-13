@@ -51,71 +51,85 @@ function call_terraform_for_plan_or_apply() {
     terraform apply $MAIN_PLAN_FILE
     rm -f $DESTROY_PLAN_FILE $MAIN_PLAN_FILE
   else
-    local TMP_VAR=""
-    local resourcePrefix="test001"
-    read -p "Please enter resource prefix (default [$resourcePrefix]): " TMP_VAR
-    resourcePrefix="${TMP_VAR:-$resourcePrefix}"
+    local FILE_OPTION="file"
 
     local TMP_VAR=""
-    local aroResourceGroup="${resourcePrefix}RG"
-    read -p "Please enter ARO resource group (default [$aroResourceGroup]): " TMP_VAR
-    aroResourceGroup="${TMP_VAR:-$aroResourceGroup}"
-
-    TMP_VAR=""
-    local aroClusterName="${resourcePrefix}Aro"
-    read -p "Please enter ARO cluster name (default [$aroClusterName]): " TMP_VAR
-    aroClusterName="${TMP_VAR:-$aroClusterName}"
-
-    TMP_VAR=""
-    local location="canadacentral"
-    read -p "Please enter location (default [$location]): " TMP_VAR
-    location="${TMP_VAR:-$location}"
-
-    TMP_VAR=""
-    local generateKubeConfig="true"
-    read -p "Generate kubeConfig (default [$generateKubeConfig]): " TMP_VAR
-    generateKubeConfig="${TMP_VAR:-$generateKubeConfig}"
-
-    local kubeConfigPathVar=""
-    if [ "$generateKubeConfig" == "true" ]; then
-      TMP_VAR=""
-      local kubeConfigPath="/tmp/kubeconfig"
-      read -p "Please enter kubeConfigPath (default [$kubeConfigPath]): " TMP_VAR
-      kubeConfigPath="${TMP_VAR:-$kubeConfigPath}"
-
-      local kubeConfigPathVar="-var kube_config_path=$kubeConfigPath"
-      if [ -z "$kubeConfigPath" ]; then
-        kubeConfigPathVar=""
-      fi
-    else
-      generateKubeConfig="false"  # Pass in false just in case user entered some other value (other than true/false)
-    fi
+    local varFileOrPromptForVars=""
+    while [[ "$varFileOrPromptForVars" != "${FILE_OPTION}" && "$varFileOrPromptForVars" != "prompt" ]]
+    do
+      read -p "For most of the variables, use file or prompt (file/prompt): " TMP_VAR
+      varFileOrPromptForVars="${TMP_VAR:-$varFileOrPromptForVars}"
+    done
 
     local extraOptions=""
-    if [ "$op" == "$PLAN" ]; then
-     extraOptions="-out ${MAIN_PLAN_FILE}"
+
+    if [ "$varFileOrPromptForVars" == "file" ]; then
+      extraOptions="-var-file=custom.tfvars"
     else
-     extraOptions="-auto-approve"
+      local resourcePrefix="test001"
+      read -p "Please enter resource prefix (default [$resourcePrefix]): " TMP_VAR
+      resourcePrefix="${TMP_VAR:-$resourcePrefix}"
+
+      local TMP_VAR=""
+      local aroResourceGroup="${resourcePrefix}RG"
+      read -p "Please enter ARO resource group (default [$aroResourceGroup]): " TMP_VAR
+      aroResourceGroup="${TMP_VAR:-$aroResourceGroup}"
+
+      TMP_VAR=""
+      local aroClusterName="${resourcePrefix}Aro"
+      read -p "Please enter ARO cluster name (default [$aroClusterName]): " TMP_VAR
+      aroClusterName="${TMP_VAR:-$aroClusterName}"
+
+      TMP_VAR=""
+      local location="canadacentral"
+      read -p "Please enter location (default [$location]): " TMP_VAR
+      location="${TMP_VAR:-$location}"
+
+      TMP_VAR=""
+      local generateKubeConfig="true"
+      read -p "Generate kubeConfig (default [$generateKubeConfig]): " TMP_VAR
+      generateKubeConfig="${TMP_VAR:-$generateKubeConfig}"
+
+      local kubeConfigPathVar=""
+      if [ "$generateKubeConfig" == "true" ]; then
+        TMP_VAR=""
+        local kubeConfigPath="/tmp/kubeconfig"
+        read -p "Please enter kubeConfigPath (default [$kubeConfigPath]): " TMP_VAR
+        kubeConfigPath="${TMP_VAR:-$kubeConfigPath}"
+
+        local kubeConfigPathVar="-var kube_config_path=$kubeConfigPath"
+        if [ -z "$kubeConfigPath" ]; then
+          kubeConfigPathVar=""
+        fi
+      else
+        generateKubeConfig="false"  # Pass in false just in case user entered some other value (other than true/false)
+      fi
+
+      extraOptions="-var \"resource_group_name=$aroResourceGroup\""
+      extraOptions="${extraOptions} -var \"cluster_name=$aroClusterName\""
+      extraOptions="${extraOptions} -var \"region=$location\""
+      extraOptions="${extraOptions} -var \"generate_kube_config=\"$generateKubeConfig\"\""
+
+      printf "\n   -> key ids/values used"
+      for i in op aroResourceGroup aroClusterName location extraOptions
+      do
+        printf "\n     - $i=${!i}"
+      done
+
     fi
 
-    printf "\n   -> key ids/values used"
-    for i in op aroResourceGroup aroClusterName location extraOptions
-    do
-      printf "\n     - $i=${!i}"
-    done
+    if [ "$op" == "$PLAN" ]; then
+     extraOptions="-out ${MAIN_PLAN_FILE} ${extraOptions}"
+    else
+     extraOptions="-auto-approve ${extraOptions}"
+    fi
 
     printf "\n\n -> Running terraform $op command...\n"
 
     set -x
-    terraform $op \
-      -compact-warnings \
-      $extraOptions \
-      -var "resource_group_name=$aroResourceGroup" \
-      -var "cluster_name=$aroClusterName" \
-      -var "region=$location" \
-      -var "generate_kube_config=$generateKubeConfig" \
-      $kubeConfigPathVar
+    terraform $op -compact-warnings $extraOptions
     set +x
+
   fi
 }
 

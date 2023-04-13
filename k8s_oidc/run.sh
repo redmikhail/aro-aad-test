@@ -88,7 +88,11 @@ function run_terraform() {
     varFileOrPromptForVars="${TMP_VAR:-$varFileOrPromptForVars}"
   done
 
-#  if [ "$varFileOrPromptForVars" != "${FILE_OPTION}" -o "$op" == "$IMPORT" ]; then
+  local extraOptions=""
+
+  if [ "$varFileOrPromptForVars" == "file" ]; then
+    extraOptions="-var-file=custom.tfvars"
+  else
     local resourcePrefix="test001"
     read -p "Please enter resource prefix (default [$resourcePrefix]): " TMP_VAR
     resourcePrefix="${TMP_VAR:-$resourcePrefix}"
@@ -102,13 +106,7 @@ function run_terraform() {
     local aroClusterName="${resourcePrefix}Aro"
     read -p "Please enter ARO cluster name (default [$aroClusterName]): " TMP_VAR
     aroClusterName="${TMP_VAR:-$aroClusterName}"
-#  fi
 
-  local extraOptions=""
-
-  if [ "$varFileOrPromptForVars" == "file" ]; then
-    extraOptions="-var-file=custom.tfvars"
-  else
     TMP_VAR=""
     local location="canadacentral"
     read -p "Please enter location (default [$location]): " TMP_VAR
@@ -129,50 +127,44 @@ function run_terraform() {
     read -p "Please enter clientSecret (default [$clientSecret]): " TMP_VAR
     clientSecret="${TMP_VAR:-$clientSecret}"
 
-    printf "\n   -> key ids/values used"
-    for i in op aroResourceGroup aroClusterName location
-    do
-      printf "\n     - $i=${!i}"
-    done
-
     extraOptions="-var \"resource_group_name=$aroResourceGroup\""
     extraOptions="${extraOptions} -var \"cluster_name=$aroClusterName\""
     extraOptions="${extraOptions} -var \"region=$location\""
     extraOptions="${extraOptions} -var \"tenant_id=\"$tenantId\"\""
     extraOptions="${extraOptions} -var \"client_id=\"$clientId\"\""
     extraOptions="${extraOptions} -var \"client_secret=\"$clientSecret\"\""
+
+    printf "\n   -> key ids/values used"
+    for i in op aroResourceGroup aroClusterName location extraOptions
+    do
+      printf "\n     - $i=${!i}"
+    done
   fi
 
   if [ "$op" == "$PLAN" ]; then
-   extraOptions="-out ${MAIN_PLAN_FILE} ${extraOptions}"
+    printf "\nPlan for 'Apply' or 'Destroy' \n"
+    select answer in "Apply" "Destroy"; do
+        case $answer in
+            Apply)
+              extraOptions="-out ${MAIN_PLAN_FILE} ${extraOptions}"               # to output the Apply plan
+              break;;
+            Destroy)
+              extraOptions="-destroy -out ${DESTROY_PLAN_FILE} ${extraOptions}"   # to output the Destroy plan
+              break;;
+        esac
+    done
   elif [ "$op" == "$APPLY" -o "$op" == "$DESTROY"  ]; then
    extraOptions="-auto-approve ${extraOptions}"
   elif [ "$op" == "$IMPORT" ]; then
-    local subscriptionId=""
-    while [[ -z "$subscriptionId" ]]
-    do
-     read -p "Please enter subscriptionId: " subscriptionId
-    done
-
-    extraOptions="${extraOptions} azapi_resource.aro_cluster /subscriptions/$subscriptionId/resourceGroups/$aroResourceGroup/providers/Microsoft.RedHatOpenShift/OpenShiftClusters/$aroClusterName"
+    extraOptions="${extraOptions} kubernetes_manifest.oidc apiVersion=config.openshift.io/v1,kind=OAuth,name=cluster"
   fi
-
 
   printf "\n\n -> Running terraform $op command...\n"
 
   set -x
-  terraform $op \
-    -compact-warnings \
-    $extraOptions
+  terraform $op -compact-warnings $extraOptions
   set +x
 }
-
-#    -var "resource_group_name=$aroResourceGroup" \
-#    -var "cluster_name=$aroClusterName" \
-#    -var "region=$location" \
-#    -var "tenant_id=\"$tenantId\"" \
-#    -var "client_id=\"$clientId\"" \
-#    -var "client_secret=\"$clientSecret\"" \
 
 
 display_menu_and_get_choice

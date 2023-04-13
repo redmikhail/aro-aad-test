@@ -1,0 +1,6 @@
+resource_group_name = "<PROVIDE_VALUE>"
+cluster_name        = "<PROVIDE_VALUE>"
+region              = "<PROVIDE_VALUE>"
+tenant_id           = "<PROVIDE_VALUE>"
+client_id           = "<PROVIDE_VALUE>"
+client_secret       = "<PROVIDE_VALUE>"
