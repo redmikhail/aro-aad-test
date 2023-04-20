@@ -21,6 +21,10 @@ crash.log
 # example.tfvars
 
 **/custom.tfvars
+**/*.cer
+**/*.crt
+**/*.cert
+**/*.key
 
 # Ignore override files as they are usually used to override resources locally and so
 # are not checked in

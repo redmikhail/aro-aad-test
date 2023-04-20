@@ -64,11 +64,15 @@ function call_terraform_for_plan_or_apply() {
 
   if [ "$op" == "$APPLY" -a -f "${MAIN_PLAN_FILE}" ]; then
     printf "\n\n -> Running terraform $op command using the ($MAIN_PLAN_FILE) file...\n"
+    set -x
     terraform apply $MAIN_PLAN_FILE
+    set +x
     rm -f $DESTROY_PLAN_FILE $MAIN_PLAN_FILE
   elif [ "$op" == "$DESTROY" -a -f "${DESTROY_PLAN_FILE}" ]; then
     printf "\n\n -> Running terraform $op command using the ($DESTROY_PLAN_FILE) file...\n"
+    set -x
     terraform apply $DESTROY_PLAN_FILE
+    set +x
     rm -f $DESTROY_PLAN_FILE $MAIN_PLAN_FILE
   else
     run_terraform "$op"

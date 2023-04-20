@@ -1,6 +1,6 @@
 # Get KubeConfig
 
-This directory contains Terraform config that can be used to generate kubeconfig
+This directory contains Terraform config that can be used to output ARO cluster details
   
 Execute following commands and substitute all the properties values with correct values in `custom.tfvars` file:
 ```
@@ -8,7 +8,7 @@ cp custom.tfvars.template custom.tfvars
 ```
 Using the `custom.tfvars` file will allow to use this file for variables instead of being prompted for each variable.
   
-To generate `kubeconfig`, execute following commands:
+To output all the ARO details, execute following commands:
 ```
 ./run.sh
 ```
@@ -18,28 +18,16 @@ changes.
   
   When running in `plan` mode, it will prompt to ask for whether to use file or prompt for variables:
   * File/prompt - give `file` as the value
-  
-    If `prompt` value is provided for previous input, it will prompt for the following variable values:
-    * Resource prefix
-    * ARO resource group
-    * ARO cluster name
-    * Location
-    * Generate kubeConfig (true/false)
-      * KubeConfig path (if previous value is true)
-  
-  All of these fields have default values but can be overridden by providing
-  new values. Once all the values are provided the script invokes `terraform`
-  by passing in the input values to corresponding variables needed by the
-  Terraform scripts.
-  
+   
   To run Terraform without using the script, please use the following command
   (substitute values with correct ones)
   ```
-  cd aro_kube_config
-  
   terraform plan -out main.tfplan -var-file=custom.tfvars
+  terraform apply main.tfplan
   ```
   
+  **Output `aro_cluster-apiServer-url` contains the ARO cluster `endpoint+port`**
+
 ## Variables used in this module:
   * `resource_group_name`: Represents the name of the Resource Group
   * `cluster_name`: Name of the ARO cluster

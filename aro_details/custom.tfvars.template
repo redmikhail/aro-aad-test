@@ -1,0 +1,3 @@
+resource_group_name  = "<PROVIDE_VALUE>"
+cluster_name         = "<PROVIDE_VALUE>"
+region               = "<PROVIDE_VALUE>"

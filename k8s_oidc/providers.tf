@@ -6,8 +6,8 @@ terraform {
       source  = "hashicorp/kubernetes"
       version = ">=2.19.0"
     }
-    local = {
-      source = "hashicorp/local"
-    }
+#    local = {
+#      source = "hashicorp/local"
+#    }
   }
 }

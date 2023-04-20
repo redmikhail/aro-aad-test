@@ -33,7 +33,26 @@ variable "tenant_id" {
   description = "Azure subscription tenant id"
 }
 
-variable "kube_config_path" {
-  default = "/tmp/kubeconfig"
-  description = "Location from where kubeConfig will be read"
+variable "cluster_url" {
+  description = "ARO cluster host url"
+}
+
+#variable "kube_config_path" {
+#  default = "/tmp/kubeconfig"
+#  description = "Location from where kubeConfig will be read"
+#}
+
+variable "client_certificate_path" {
+  default = "/tmp/aro-cluster-client.crt"
+  description = "Location of client certificate for ARO cluster"
+}
+
+variable "client_key_path" {
+  default = "/tmp/aro-cluster-client.key"
+  description = "Location of client key for ARO cluster"
+}
+
+variable "ca_certificate_path" {
+  default = "/tmp/aro-cluster-ca.crt"
+  description = "Location of ca certificate for ARO cluster"
 }

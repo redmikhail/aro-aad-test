@@ -10,7 +10,6 @@ Using the `custom.tfvars` file will allow to use this file for variables instead
   
 To generate `kubeconfig`, execute following commands:
 ```
-cd aro_kube_config
 ./run.sh
 ```
   
