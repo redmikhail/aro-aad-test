@@ -4,6 +4,13 @@
 **/TMP
 **/tmp
 
+**/pull-secret.txt
+**/*ignore*.txt
+read_aro_details/*.json
+**/*-app-service-principal.json
+**/*-create-*-role-assignment.json
+**/*.out
+
 # Local .terraform directories
 **/.terraform/*
 
